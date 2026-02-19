@@ -14,7 +14,21 @@ end
 function M.visualize_pandas_df()
 	dap.repl.execute("import visidata")
 	local selected_dataframe = get_visual_selection()[1]
-	dap.repl.execute("visidata.vd.view_pandas(" .. selected_dataframe .. ")")
+	dap.repl.execute([[
+        import visidata
+        import pandas as pd
+
+        df = ]] .. selected_dataframe .. [[
+
+        try:
+            import polars as pl
+            if isinstance(df, pl.DataFrame):
+                df = df.to_pandas()
+        except ImportError:
+            pass
+
+        visidata.vd.view_pandas(df)
+]])
 end
 
 return M
